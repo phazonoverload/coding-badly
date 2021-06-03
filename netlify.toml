@@ -1,6 +1,14 @@
 [build]
     functions = "functions"
 
+[dev]
+    autoLaunch = false
+
+[[redirects]]
+    from = "/"
+    to = "/.netlify/functions/info"
+    status = 200
+
 [[redirects]]
     from = "/api/*"
     to = "/.netlify/functions/:splat"
