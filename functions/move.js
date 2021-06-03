@@ -1,5 +1,7 @@
 exports.handler = async event => {
   try {
+    console.log(event)
+
     return res({ move: 'left' })
   } catch (error) {
     return res({ error }, 500)
