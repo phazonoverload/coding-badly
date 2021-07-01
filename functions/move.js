@@ -1,10 +1,12 @@
 exports.handler = async event => {
   try {
-    const { board, you: { head, body } } = JSON.parse(event.body)
+    const { board, you } = JSON.parse(event.body)
+    const { head, body } = you
 
     // console.log(board.width, board.height)
     // console.log(head.x, head.y)
 
+    // Viable Options
     let vO = ['left', 'right', 'up', 'down']
 
     // Avoid walls
@@ -28,6 +30,38 @@ exports.handler = async event => {
         }
         if(head.y + 1 == y && head.x == x) {
           vO = vO.filter(v => v != 'up')
+        }
+      }
+
+
+      // Avoid other heads
+      if(snake.id != you.id) {
+        // Opposing Head
+        const { head: oH } = snake
+
+        // Possible Opponent Head Position Next Turn
+        // We are cutting off x-1,y-1, etc. Is this overkill?
+        const pohpnt = []
+        for(let i=oH.x-1; i<=oH.x+1; i++) {
+          for(let j=oH.y-1; j<=oH.y+1; j++) {
+            pohpnt.push({ x: i, y: j })
+          }
+        }
+
+        for(let part of pohpnt) {
+          const { x, y } = part
+          if(head.x - 1 == x && head.y == y) {
+            vO = vO.filter(v => v != 'left')
+          }
+          if(head.x + 1 == x && head.y == y) {
+            vO = vO.filter(v => v != 'right')
+          }
+          if(head.y - 1 == y && head.x == x) {
+            vO = vO.filter(v => v != 'down')
+          }
+          if(head.y + 1 == y && head.x == x) {
+            vO = vO.filter(v => v != 'up')
+          }
         }
       }
     }
