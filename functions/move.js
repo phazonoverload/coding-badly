@@ -1,6 +1,6 @@
 exports.handler = async event => {
   try {
-    const { board, you: { head, body, snakes } } = JSON.parse(event.body)
+    const { board, you: { head, body } } = JSON.parse(event.body)
 
     // console.log(board.width, board.height)
     // console.log(head.x, head.y)
@@ -14,7 +14,7 @@ exports.handler = async event => {
     if(head.y == board.height-1) vO = vO.filter(v => v != 'up')
 
     // Avoid all snakes
-    for(let snake of snakes) {
+    for(let snake of board.snakes) {
       for(let part of snake.body.slice(0, body.length-1)) {
         const { x, y } = part
         if(head.x - 1 == x && head.y == y) {
@@ -36,6 +36,7 @@ exports.handler = async event => {
       move: vO[Math.floor(Math.random()*vO.length)]
     })
   } catch (error) {
+    console.error(error)
     return res({ error }, 500)
   }
 }
