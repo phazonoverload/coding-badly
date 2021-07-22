@@ -1,3 +1,6 @@
+// Viable Options
+let vO = ['left', 'right', 'up', 'down']
+
 exports.handler = async event => {
   try {
     const { board, you } = JSON.parse(event.body)
@@ -6,14 +9,11 @@ exports.handler = async event => {
     // console.log(board.width, board.height)
     // console.log(head.x, head.y)
 
-    // Viable Options
-    let vO = ['left', 'right', 'up', 'down']
-
     // Avoid walls
-    if(head.x == 0) vO = vO.filter(v => v != 'left')
-    if(head.x == board.width-1) vO = vO.filter(v => v != 'right')
-    if(head.y == 0) vO = vO.filter(v => v != 'down')
-    if(head.y == board.height-1) vO = vO.filter(v => v != 'up')
+    if (head.x == 0) vO = vO.filter(v => v != 'left')
+    if (head.x == board.width - 1) vO = vO.filter(v => v != 'right')
+    if (head.y == 0) vO = vO.filter(v => v != 'down')
+    if (head.y == board.height - 1) vO = vO.filter(v => v != 'up')
 
     // Avoid all snakes
     for (let snake of board.snakes) {
@@ -63,6 +63,8 @@ exports.handler = async event => {
           }
         }
       }
+
+      if (vO.length == 0) findAnyEmptySpace(board, you)
     }
 
     if (board.hazards) {
@@ -89,7 +91,6 @@ exports.handler = async event => {
       if (cH) {
         // case 1: there is an easy out
 
-        // is the space on the left a hazard
         if (board.hazards.find(hazard => hazard !== { x: cH.x - 1, y: cH.y })) vO.push('left')
         if (board.hazards.find(hazard => hazard !== { x: cH.x + 1, y: cH.y })) vO.push('right')
         if (board.hazards.find(hazard => hazard !== { x: cH.y - 1, y: cH.x })) vO.push('down')
@@ -97,15 +98,32 @@ exports.handler = async event => {
 
         // case 2: you are in a corner
       }
+
+      if (vO.length == 0) findAnyEmptySpace(board, you)
     }
 
     return res({
-      move: vO[Math.floor(Math.random()*vO.length)]
+      move: vO[Math.floor(Math.random() * vO.length)]
     })
   } catch (error) {
     console.error(error)
     return res({ error }, 500)
   }
+}
+
+function findAnyEmptySpace(board, you) {
+  const { head } = you
+  for (let snake of board.snakes) {
+    for (let part of snake.body.slice(0, body.length)) {
+      const { x, y } = part
+      if (!(head.x - 1 == x && head.y == y)) vO.push('left')
+      if (!(head.x + 1 == x && head.y == y)) vO.push('right')
+      if (!(head.y - 1 == y && head.x == x)) vO.push('down')
+      if (!(head.y + 1 == y && head.x == x)) vO.push('up')
+    }
+  }
+
+  // if(head.x-1 == )
 }
 
 function res(o, statusCode = 200) {
