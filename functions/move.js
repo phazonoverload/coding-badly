@@ -16,53 +16,86 @@ exports.handler = async event => {
     if(head.y == board.height-1) vO = vO.filter(v => v != 'up')
 
     // Avoid all snakes
-    for(let snake of board.snakes) {
-      for(let part of snake.body.slice(0, body.length-1)) {
+    for (let snake of board.snakes) {
+      for (let part of snake.body.slice(0, body.length)) {
         const { x, y } = part
-        if(head.x - 1 == x && head.y == y) {
+        if (head.x - 1 == x && head.y == y) {
           vO = vO.filter(v => v != 'left')
         }
-        if(head.x + 1 == x && head.y == y) {
+        if (head.x + 1 == x && head.y == y) {
           vO = vO.filter(v => v != 'right')
         }
-        if(head.y - 1 == y && head.x == x) {
+        if (head.y - 1 == y && head.x == x) {
           vO = vO.filter(v => v != 'down')
         }
-        if(head.y + 1 == y && head.x == x) {
+        if (head.y + 1 == y && head.x == x) {
           vO = vO.filter(v => v != 'up')
         }
       }
 
-
       // Avoid other heads
-      if(snake.id != you.id) {
+      if (snake.id != you.id) {
         // Opposing Head
         const { head: oH } = snake
 
         // Possible Opponent Head Position Next Turn
         // We are cutting off x-1,y-1, etc. Is this overkill?
         const pohpnt = []
-        for(let i=oH.x-1; i<=oH.x+1; i++) {
-          for(let j=oH.y-1; j<=oH.y+1; j++) {
+        for (let i = oH.x - 1; i <= oH.x + 1; i++) {
+          for (let j = oH.y - 1; j <= oH.y + 1; j++) {
             pohpnt.push({ x: i, y: j })
           }
         }
 
-        for(let part of pohpnt) {
+        for (let part of pohpnt) {
           const { x, y } = part
-          if(head.x - 1 == x && head.y == y) {
+          if (head.x - 1 == x && head.y == y) {
             vO = vO.filter(v => v != 'left')
           }
-          if(head.x + 1 == x && head.y == y) {
+          if (head.x + 1 == x && head.y == y) {
             vO = vO.filter(v => v != 'right')
           }
-          if(head.y - 1 == y && head.x == x) {
+          if (head.y - 1 == y && head.x == x) {
             vO = vO.filter(v => v != 'down')
           }
-          if(head.y + 1 == y && head.x == x) {
+          if (head.y + 1 == y && head.x == x) {
             vO = vO.filter(v => v != 'up')
           }
         }
+      }
+    }
+
+    if (board.hazards) {
+      // avoid if possible
+      for (let hazard of board.hazards) {
+        const { x, y } = hazard
+        if (head.x - 1 == x && head.y == y) {
+          vO = vO.filter(v => v != 'left')
+        }
+        if (head.x + 1 == x && head.y == y) {
+          vO = vO.filter(v => v != 'right')
+        }
+        if (head.y - 1 == y && head.x == x) {
+          vO = vO.filter(v => v != 'down')
+        }
+        if (head.y + 1 == y && head.x == x) {
+          vO = vO.filter(v => v != 'up')
+        }
+      }
+
+      // are we in a hazard square
+      // collidingHazard
+      let cH = board.hazards.find(hazard => hazard === head)
+      if (cH) {
+        // case 1: there is an easy out
+
+        // is the space on the left a hazard
+        if (board.hazards.find(hazard => hazard !== { x: cH.x - 1, y: cH.y })) vO.push('left')
+        if (board.hazards.find(hazard => hazard !== { x: cH.x + 1, y: cH.y })) vO.push('right')
+        if (board.hazards.find(hazard => hazard !== { x: cH.y - 1, y: cH.x })) vO.push('down')
+        if (board.hazards.find(hazard => hazard !== { x: cH.y + 1, y: cH.x })) vO.push('up')
+
+        // case 2: you are in a corner
       }
     }
 
